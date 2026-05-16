@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: robot-jobs-postgres
+    environment:
+      POSTGRES_DB: robot_jobs
+      POSTGRES_USER: robot_user
+      POSTGRES_PASSWORD: robot_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U robot_user -d robot_jobs"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    container_name: robot-jobs-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/robot_jobs
+      SPRING_DATASOURCE_USERNAME: robot_user
+      SPRING_DATASOURCE_PASSWORD: robot_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+
+  client:
+    build:
+      context: ./client
+    container_name: robot-jobs-client
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres_data:

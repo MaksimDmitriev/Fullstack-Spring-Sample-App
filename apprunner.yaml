@@ -1,0 +1,15 @@
+version: 1.0
+runtime: corretto21
+build:
+  commands:
+    build:
+      - cd backend && ./mvnw -DskipTests package
+run:
+  runtime-version: 21
+  command: java -jar backend/target/robot-job-tracker-0.0.1-SNAPSHOT.jar
+  network:
+    port: 8080
+    env: PORT
+  env:
+    - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+      value: update
