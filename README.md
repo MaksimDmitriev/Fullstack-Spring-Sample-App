@@ -113,7 +113,7 @@ High-level steps:
 4. Add App Runner environment variables:
 
 ```text
-SPRING_DATASOURCE_URL=jdbc:postgresql://<rds-endpoint>:5432/robot_jobs
+SPRING_DATASOURCE_URL=jdbc:postgresql://<rds-endpoint>:5432/robot-jobs-db
 SPRING_DATASOURCE_USERNAME=<rds-user>
 SPRING_DATASOURCE_PASSWORD=<rds-password>
 SPRING_JPA_HIBERNATE_DDL_AUTO=update

@@ -3,7 +3,7 @@ services:
     image: postgres:16
     container_name: robot-jobs-postgres
     environment:
-      POSTGRES_DB: robot_jobs
+      POSTGRES_DB: robot-jobs-db
       POSTGRES_USER: robot_user
       POSTGRES_PASSWORD: robot_password
     ports:
@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U robot_user -d robot_jobs"]
+      test: ["CMD-SHELL", "pg_isready -U robot_user -d robot-jobs-db"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -24,7 +24,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/robot_jobs
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/robot-jobs-db
       SPRING_DATASOURCE_USERNAME: robot_user
       SPRING_DATASOURCE_PASSWORD: robot_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
