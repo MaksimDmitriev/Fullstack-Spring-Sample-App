@@ -10,6 +10,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -50,11 +51,15 @@ function App() {
     return response.json();
   }
 
-  async function loadJobs() {
+  async function loadJobs(nextStatusFilter = statusFilter) {
     setIsLoading(true);
     setError('');
     try {
-      setJobs(await request('/api/jobs'));
+      const path =
+        nextStatusFilter === 'ALL'
+          ? '/api/jobs'
+          : `/api/jobs/status/${nextStatusFilter}`;
+      setJobs(await request(path));
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -92,7 +97,13 @@ function App() {
         method: 'PATCH',
         body: JSON.stringify({ status }),
       });
-      setJobs((currentJobs) => currentJobs.map((job) => (job.id === id ? updated : job)));
+      setJobs((currentJobs) => {
+        if (statusFilter !== 'ALL' && updated.status !== statusFilter) {
+          return currentJobs.filter((job) => job.id !== id);
+        }
+
+        return currentJobs.map((job) => (job.id === id ? updated : job));
+      });
     } catch (requestError) {
       setError(requestError.message);
     }
@@ -115,7 +126,7 @@ function App() {
           <p className="eyebrow">Spring Boot + PostgreSQL + AWS practice</p>
           <h1>Robot Job Tracker</h1>
         </div>
-        <button className="secondary-button" onClick={loadJobs} disabled={isLoading}>
+        <button className="secondary-button" onClick={() => loadJobs()} disabled={isLoading}>
           Refresh
         </button>
       </section>
@@ -180,8 +191,28 @@ function App() {
 
         <section className="job-table-section">
           <div className="section-heading">
-            <h2>Jobs</h2>
-            <span>{isLoading ? 'Loading' : `${jobs.length} records`}</span>
+            <div>
+              <h2>Jobs</h2>
+              <span>{isLoading ? 'Loading' : `${jobs.length} records`}</span>
+            </div>
+            <label className="filter-control">
+              Status
+              <select
+                value={statusFilter}
+                onChange={(event) => {
+                  const nextStatusFilter = event.target.value;
+                  setStatusFilter(nextStatusFilter);
+                  loadJobs(nextStatusFilter);
+                }}
+              >
+                <option value="ALL">ALL</option>
+                {STATUSES.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
 
           <div className="table-scroll">

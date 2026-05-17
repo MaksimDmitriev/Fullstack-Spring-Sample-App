@@ -3,6 +3,7 @@ package com.example.robotjobtracker.controller;
 import com.example.robotjobtracker.dto.CreateRobotJobRequest;
 import com.example.robotjobtracker.dto.RobotJobResponse;
 import com.example.robotjobtracker.dto.UpdateRobotJobStatusRequest;
+import com.example.robotjobtracker.entity.JobStatus;
 import com.example.robotjobtracker.service.RobotJobService;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -36,6 +37,11 @@ public class RobotJobController {
     @GetMapping("/{id}")
     public RobotJobResponse getJob(@PathVariable Long id) {
         return service.getJob(id);
+    }
+
+    @GetMapping("/status/{status}")
+    public List<RobotJobResponse> getJobsByStatus(@PathVariable JobStatus status) {
+        return service.getJobsByStatus(status);
     }
 
     @PostMapping

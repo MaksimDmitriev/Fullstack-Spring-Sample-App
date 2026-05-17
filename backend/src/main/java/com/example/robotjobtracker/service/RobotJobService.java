@@ -32,6 +32,13 @@ public class RobotJobService {
         return RobotJobResponse.from(findJob(id));
     }
 
+    @Transactional(readOnly = true)
+    public List<RobotJobResponse> getJobsByStatus(JobStatus status) {
+        return repository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))
+                .stream().filter(j -> j.getStatus() == status)
+                .map(RobotJobResponse::from).toList();
+    }
+
     @Transactional
     public RobotJobResponse createJob(CreateRobotJobRequest request) {
         RobotJob job = new RobotJob(
